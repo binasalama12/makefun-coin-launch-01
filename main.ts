@@ -24,12 +24,16 @@ function fail(message: string): never {
 }
 
 const source = join(BOT_DIR, 'LAUNCH.json');
-let launch: { mint?: unknown; create_signature?: unknown };
+let parsed: unknown;
 try {
-  launch = JSON.parse(readFileSync(source, 'utf8'));
+  parsed = JSON.parse(readFileSync(source, 'utf8'));
 } catch (err) {
   fail(`LAUNCH.json could not be read from ${source}: ${(err as Error).message}`);
 }
+if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+  fail('LAUNCH.json is not a JSON object');
+}
+const launch = parsed as { mint?: unknown; create_signature?: unknown };
 
 const mint = launch.mint;
 const createSignature = launch.create_signature;
